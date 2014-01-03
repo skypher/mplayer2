@@ -128,6 +128,7 @@ enum mp_command_type {
     MP_CMD_ASS_USE_MARGINS,
     MP_CMD_SWITCH_TITLE,
     MP_CMD_STOP,
+    MP_CMD_LIST_1,
 
     /// DVDNAV commands
     MP_CMD_DVDNAV_UP = 1000,

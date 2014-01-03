@@ -2458,6 +2458,9 @@ static struct property_osd_display {
     { "tv_saturation", OSD_SATURATION, -1, _("Saturation") },
     { "tv_contrast", OSD_CONTRAST, -1, _("Contrast") },
 #endif
+    { "list1", 0, -1, _("Add to list 1")},
+    //{ "list2", 0, -1, _("Added to list 2")},
+    //{ "list3", 0, -1, _("Added to list 3")},
     {}
 };
 
@@ -2584,6 +2587,9 @@ static struct {
     { "tv_saturation", MP_CMD_TV_SET_SATURATION, 0},
     { "tv_contrast", MP_CMD_TV_SET_CONTRAST, 0},
 #endif
+    { "list1", MP_CMD_LIST_1, 0},
+    //{ "list2", MP_CMD_LIST_2, 0},
+    //{ "list3", MP_CMD_LIST_3, 0},
     {}
 };
 
@@ -3046,6 +3052,47 @@ void run_command(MPContext *mpctx, mp_cmd_t *cmd)
             /* NOP */;
         mpctx->stop_play = PT_STOP;
         break;
+
+    case MP_CMD_LIST_1: {
+            char *home = strdup(getenv("HOME"));
+            char list[4096];
+            int nbytes;
+            char* absname = NULL;
+            FILE* f;
+
+            if (mpctx->filename[0] == '/') {
+                absname = mpctx->filename;
+            } else {
+                char cwd[4096];
+                getcwd(cwd, 4096);
+                absname = malloc(4096);
+                snprintf(absname, 4096, "%s/%s", cwd, mpctx->filename);
+            }
+            strcat(absname, "\n");
+
+
+            snprintf(list, 4095, "%s/%s", home, "mplayer_list1.txt");
+
+            printf("adding %s to list 1 (%s)\n", absname, list);
+
+            f = fopen(list, "a");
+            if (!f) {
+                set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration, "Failed to add file to list 1 (fopen).");
+                if (absname) free(absname);
+                return;
+            }
+            nbytes = fwrite(absname, strlen(absname), 1, f);
+            if (nbytes != 1) {
+                set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration, "Failed to add file to list 1 (fwrite).");
+                if (absname) free(absname);
+                fclose(f);
+                return;
+            }
+            fclose(f);
+
+            set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration, "File added to list 1.");
+        break;
+    }
 
     case MP_CMD_OSD_SHOW_PROGRESSION: {
         set_osd_bar(mpctx, 0, "Position", 0, 100, get_percent_pos(mpctx));
