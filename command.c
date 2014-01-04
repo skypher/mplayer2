@@ -2458,6 +2458,7 @@ static struct property_osd_display {
     { "tv_saturation", OSD_SATURATION, -1, _("Saturation") },
     { "tv_contrast", OSD_CONTRAST, -1, _("Contrast") },
 #endif
+    { "delete_file", 0, -1, _("File deleted")},
     {}
 };
 
@@ -2584,6 +2585,7 @@ static struct {
     { "tv_saturation", MP_CMD_TV_SET_SATURATION, 0},
     { "tv_contrast", MP_CMD_TV_SET_CONTRAST, 0},
 #endif
+    { "delete_file", MP_CMD_DELETE_FILE, 0},
     {}
 };
 
@@ -3045,6 +3047,13 @@ void run_command(MPContext *mpctx, mp_cmd_t *cmd)
                 PLAY_TREE_ITER_END)
             /* NOP */;
         mpctx->stop_play = PT_STOP;
+        break;
+
+    case MP_CMD_DELETE_FILE:
+        printf("about to unlink %s\n", mpctx->filename);
+        unlink(mpctx->filename);
+        set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration,
+                     "File deleted.");
         break;
 
     case MP_CMD_OSD_SHOW_PROGRESSION: {

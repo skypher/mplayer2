@@ -115,6 +115,7 @@ static const mp_cmd_t mp_cmds[] = {
   { MP_CMD_QUIT, "quit", { OARG_INT(0) } },
   { MP_CMD_STOP, "stop", },
   { MP_CMD_PAUSE, "pause", },
+  { MP_CMD_DELETE_FILE, "delete_file", },
   { MP_CMD_FRAME_STEP, "frame_step", },
   { MP_CMD_PLAY_TREE_STEP, "pt_step", { ARG_INT, OARG_INT(0) } },
   { MP_CMD_PLAY_TREE_UP_STEP, "pt_up_step", { ARG_INT, OARG_INT(0) } },
