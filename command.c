@@ -3102,7 +3102,6 @@ void run_command(MPContext *mpctx, mp_cmd_t *cmd)
             talloc_free(home);
         break;
     }
->>>>>>> lpolzer-add-to-list
 
     case MP_CMD_OSD_SHOW_PROGRESSION: {
         set_osd_bar(mpctx, 0, "Position", 0, 100, get_percent_pos(mpctx));
