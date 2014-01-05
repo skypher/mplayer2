@@ -2459,6 +2459,9 @@ static struct property_osd_display {
     { "tv_contrast", OSD_CONTRAST, -1, _("Contrast") },
 #endif
     { "delete_file", 0, -1, _("File deleted")},
+    { "list1", 0, -1, _("Add to list 1")},
+    //{ "list2", 0, -1, _("Added to list 2")},
+    //{ "list3", 0, -1, _("Added to list 3")},
     {}
 };
 
@@ -2586,6 +2589,9 @@ static struct {
     { "tv_contrast", MP_CMD_TV_SET_CONTRAST, 0},
 #endif
     { "delete_file", MP_CMD_DELETE_FILE, 0},
+    { "list1", MP_CMD_LIST_1, 0},
+    //{ "list2", MP_CMD_LIST_2, 0},
+    //{ "list3", MP_CMD_LIST_3, 0},
     {}
 };
 
@@ -3052,9 +3058,51 @@ void run_command(MPContext *mpctx, mp_cmd_t *cmd)
     case MP_CMD_DELETE_FILE:
         printf("about to unlink %s\n", mpctx->filename);
         unlink(mpctx->filename);
-        set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration,
-                     "File deleted.");
+        set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration, "File deleted.");
         break;
+
+    case MP_CMD_LIST_1: {
+            char *home, *list, *absname;
+            int nbytes;
+            FILE *f;
+
+            home = talloc_strdup(NULL, getenv("HOME"));
+
+            if (mpctx->filename[0] == '/') {
+                absname = talloc_strdup(home, mpctx->filename);
+            } else {
+                char cwd[4096];
+                getcwd(cwd, 4096);
+                absname = talloc_asprintf(home, "%s/%s", cwd, mpctx->filename);
+            }
+            absname = talloc_strdup_append(absname, "\n");
+
+
+            list = talloc_asprintf(NULL, "%s/%s", home, "mplayer_list1.txt");
+
+            printf("adding %s to list 1 (%s)\n", absname, list);
+
+            f = fopen(list, "a");
+            if (!f) {
+                set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration, "Failed to add file to list 1 (fopen).");
+                talloc_free(home);
+                return;
+            }
+            nbytes = fwrite(absname, strlen(absname), 1, f);
+            if (nbytes != 1) {
+                set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration, "Failed to add file to list 1 (fwrite).");
+                talloc_free(home);
+                fclose(f);
+                return;
+            }
+            fclose(f);
+
+            set_osd_tmsg(OSD_MSG_TEXT, 1, osd_duration, "File added to list 1.");
+
+            talloc_free(home);
+        break;
+    }
+>>>>>>> lpolzer-add-to-list
 
     case MP_CMD_OSD_SHOW_PROGRESSION: {
         set_osd_bar(mpctx, 0, "Position", 0, 100, get_percent_pos(mpctx));
